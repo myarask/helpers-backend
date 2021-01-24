@@ -51,6 +51,17 @@ const typeDefs = gql`
     roleId: Int!
   }
 
+  type Role {
+    id: Int!
+    name: String!
+  }
+
+  type Service {
+    id: Int!
+    name: String
+    fee: Int
+  }
+
   type User {
     id: Int!
     email: String
@@ -58,12 +69,6 @@ const typeDefs = gql`
     customerId: String
     clients: [Client]
     phoneNumber: String
-  }
-
-  type Service {
-    id: Int!
-    name: String
-    fee: Int
   }
 
   type Visit {
@@ -99,8 +104,15 @@ const typeDefs = gql`
   }
 
   type Query {
+    agencies: [Agency]
+    agency(id: Int!): Agency
+    clients: [Client]
+    internalRoles: [Role]
+    agencyRoles: [Role]
+    roles: [Role]
     services: [Service]
     visit(id: Int!): Visit
+    internalUsers: [User]
     myUser: User
   }
 `;

@@ -16,6 +16,15 @@ const prisma = new PrismaClient();
 
 const resolvers = {
   Query: {
+    agencies: () => prisma.agencies.findMany(),
+    agency: (_, { id }) => prisma.agencies.findFirst({ where: { id } }),
+    clients: () => prisma.clients.findMany(),
+    roles: () => prisma.roles.findMany(),
+    // TODO: replace internalRoles and agencyRoles with roles
+    internalRoles: () =>
+      prisma.roles.findMany({ where: { isInternalRole: true } }),
+    agencyRoles: () => prisma.roles.findMany({ where: { isAgencyRole: true } }),
+    internalUsers: () => prisma.internalUsers.findMany(),
     services: () => prisma.services.findMany(),
     visit: (_, args: { id: number }, context: Context) =>
       prisma.visits.findFirst({
