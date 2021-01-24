@@ -13,7 +13,7 @@
     "noImplicitReturns": true,
     "noUncheckedIndexedAccess": true,
     "noUnusedLocals": true,
-    "noUnusedParameters": true,
+    "noUnusedParameters": false,
     "moduleResolution": "node",
     "sourceMap": true,
     "outDir": "dist",
