@@ -1,0 +1,179 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Agencies {
+  id          Int           @id @default(autoincrement())
+  name        String?
+  createdAt   DateTime
+  updatedAt   DateTime
+  deletedAt   DateTime?
+  AgencyUsers AgencyUsers[]
+}
+
+model AgencyUserRoles {
+  id           Int          @id @default(autoincrement())
+  agencyUserId Int?
+  roleId       Int?
+  createdAt    DateTime
+  updatedAt    DateTime
+  deletedAt    DateTime?
+  AgencyUsers  AgencyUsers? @relation(fields: [agencyUserId], references: [id])
+  Roles        Roles?       @relation(fields: [roleId], references: [id])
+}
+
+model AgencyUserServices {
+  id           Int         @id @default(autoincrement())
+  createdAt    DateTime
+  updatedAt    DateTime
+  deletedAt    DateTime?
+  serviceId    Int
+  agencyUserId Int
+  AgencyUsers  AgencyUsers @relation(fields: [agencyUserId], references: [id])
+  Services     Services    @relation(fields: [serviceId], references: [id])
+}
+
+model AgencyUsers {
+  id                 Int                  @id @default(autoincrement())
+  userId             Int
+  agencyId           Int
+  createdAt          DateTime
+  updatedAt          DateTime
+  deletedAt          DateTime?
+  Agencies           Agencies             @relation(fields: [agencyId], references: [id])
+  Users              Users                @relation(fields: [userId], references: [id])
+  AgencyUserRoles    AgencyUserRoles[]
+  AgencyUserServices AgencyUserServices[]
+  Visits             Visits[]
+
+  @@unique([agencyId, userId], name: "unique_constraint_with_user_and_agency")
+}
+
+model Clients {
+  id          Int       @id @default(autoincrement())
+  userId      Int?
+  createdAt   DateTime
+  updatedAt   DateTime
+  deletedAt   DateTime?
+  approvedAt  DateTime?
+  city        String
+  country     String
+  line1       String
+  line2       String?
+  postalCode  String
+  state       String
+  fullName    String
+  phoneNumber String?
+  Users       Users?    @relation(fields: [userId], references: [id])
+  Visits      Visits[]
+}
+
+model InternalUserRoles {
+  id             Int            @id @default(autoincrement())
+  internalUserId Int?
+  roleId         Int?
+  createdAt      DateTime
+  updatedAt      DateTime
+  deletedAt      DateTime?
+  InternalUsers  InternalUsers? @relation(fields: [internalUserId], references: [id])
+  Roles          Roles?         @relation(fields: [roleId], references: [id])
+}
+
+model InternalUsers {
+  id                Int                 @id @default(autoincrement())
+  userId            Int?
+  createdAt         DateTime
+  updatedAt         DateTime
+  deletedAt         DateTime?
+  Users             Users?              @relation(fields: [userId], references: [id])
+  InternalUserRoles InternalUserRoles[]
+}
+
+model Roles {
+  id                Int                 @id @default(autoincrement())
+  name              String?
+  createdAt         DateTime
+  updatedAt         DateTime
+  isInternalRole    Boolean?
+  isAgencyRole      Boolean?
+  deletedAt         DateTime?
+  AgencyUserRoles   AgencyUserRoles[]
+  InternalUserRoles InternalUserRoles[]
+}
+
+model SequelizeMeta {
+  name String @id
+}
+
+model Services {
+  id                 Int                  @id @default(autoincrement())
+  createdAt          DateTime
+  updatedAt          DateTime
+  deletedAt          DateTime?
+  name               String
+  fee                Int
+  AgencyUserServices AgencyUserServices[]
+  VisitServices      VisitServices[]
+}
+
+model Users {
+  id            Int             @id @default(autoincrement())
+  createdAt     DateTime
+  updatedAt     DateTime
+  email         String          @unique
+  fullName      String?
+  auth0Id       String?
+  deletedAt     DateTime?
+  customerId    String?
+  phoneNumber   String?
+  AgencyUsers   AgencyUsers[]
+  Clients       Clients[]
+  InternalUsers InternalUsers[]
+  Visits        Visits[]
+}
+
+model VisitServices {
+  id        Int       @id @default(autoincrement())
+  visitId   Int
+  serviceId Int
+  name      String?
+  fee       Int?
+  createdAt DateTime?
+  updatedAt DateTime?
+  deletedAt DateTime?
+  Services  Services  @relation(fields: [serviceId], references: [id])
+  Visits    Visits    @relation(fields: [visitId], references: [id])
+}
+
+model Visits {
+  id              Int             @id @default(autoincrement())
+  clientId        Int?
+  userId          Int?
+  agencyUserId    Int?
+  notes           String?
+  city            String
+  country         String
+  state           String
+  line1           String
+  line2           String?
+  postalCode      String
+  releasedAt      DateTime?
+  matchedAt       DateTime?
+  startedAt       DateTime?
+  finishedAt      DateTime?
+  cancelledAt     DateTime?
+  createdAt       DateTime?
+  updatedAt       DateTime?
+  deletedAt       DateTime?
+  baseFee         Int?
+  paymentIntentId String?
+  AgencyUsers     AgencyUsers?    @relation(fields: [agencyUserId], references: [id])
+  Clients         Clients?        @relation(fields: [clientId], references: [id])
+  Users           Users?          @relation(fields: [userId], references: [id])
+  VisitServices   VisitServices[]
+}

@@ -1,7 +1,15 @@
+import { PrismaClient } from "@prisma/client";
+
+const prisma = new PrismaClient();
+
 const resolvers = {
   Query: {
-    services: (_: any, __: any, { models }: { models: any }) => {
-      return models.Service.findAll();
+    services: () => {
+      return prisma.services.findMany();
+    },
+    visit: (_: any, { id }: { id: number }) => {
+      // SECURITY: Visits should only be readable by participants
+      return prisma.visits.findFirst({ where: { id } });
     },
   },
 };
