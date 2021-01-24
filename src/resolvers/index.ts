@@ -26,16 +26,16 @@ const resolvers = {
     agencyRoles: () => prisma.roles.findMany({ where: { isAgencyRole: true } }),
     internalUsers: () => prisma.internalUsers.findMany(),
     services: () => prisma.services.findMany(),
-    visit: (_, args: { id: number }, context: Context) =>
+    visit: (_, { id }, context: Context) =>
       prisma.visits.findFirst({
         where: {
-          id: args.id,
+          id,
           Users: {
             auth0Id: context.user.sub, // Only readable by visit creator
           },
         },
       }),
-    myUser: (_, __, context) =>
+    myUser: (_, __, context: Context) =>
       prisma.users.findFirst({ where: { auth0Id: context.user.sub } }),
   },
   Client: {
