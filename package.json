@@ -13,11 +13,14 @@
   "license": "ISC",
   "dependencies": {
     "@prisma/client": "^2.15.0",
+    "@types/express-jwt": "^6.0.0",
     "@types/node": "^14.14.22",
     "apollo-server": "^2.19.2",
     "apollo-server-express": "^2.19.2",
     "dotenv": "^8.2.0",
-    "graphql": "^15.4.0"
+    "express-jwt": "^6.0.0",
+    "graphql": "^15.4.0",
+    "jwks-rsa": "^1.12.2"
   },
   "devDependencies": {
     "@prisma/cli": "^2.15.0",
