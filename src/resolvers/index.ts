@@ -26,6 +26,38 @@ const resolvers = {
           },
         },
       }),
+    myUser: (_, __, context) =>
+      prisma.users.findFirst({ where: { auth0Id: context.user.sub } }),
+  },
+  Client: {
+    user: ({ id }) => prisma.clients.findUnique({ where: { id } }).Users(),
+  },
+  User: {
+    clients: ({ id }) => prisma.users.findUnique({ where: { id } }).Clients(),
+  },
+  Visit: {
+    client: ({ id }) => prisma.visits.findUnique({ where: { id } }).Clients(),
+    services: ({ id }) =>
+      prisma.visits.findUnique({ where: { id } }).VisitServices(),
+    agencyUser: ({ id }) =>
+      prisma.visits.findUnique({ where: { id } }).AgencyUsers(),
+  },
+  Agency: {
+    users: ({ id }) =>
+      prisma.agencies.findUnique({ where: { id } }).AgencyUsers(),
+  },
+  InternalUser: {
+    roles: ({ id }) =>
+      prisma.internalUsers.findUnique({ where: { id } }).InternalUserRoles(),
+    user: ({ id }) =>
+      prisma.internalUsers.findUnique({ where: { id } }).Users(),
+  },
+  AgencyUser: {
+    user: ({ id }) => prisma.agencyUsers.findUnique({ where: { id } }).Users(),
+    roles: ({ id }) =>
+      prisma.agencyUsers.findUnique({ where: { id } }).AgencyUserRoles(),
+    services: ({ id }) =>
+      prisma.agencyUsers.findUnique({ where: { id } }).AgencyUserServices(),
   },
 };
 

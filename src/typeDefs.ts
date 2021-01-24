@@ -1,14 +1,34 @@
 import { gql } from "apollo-server-express";
 
 const typeDefs = gql`
+  type Agency {
+    id: Int!
+    name: String
+    users: [AgencyUser]!
+  }
+
   type AgencyUser {
     id: Int
     user: User
+    roles: [AgencyUserRole]
+    services: [AgencyUserService]
+  }
+
+  type AgencyUserRole {
+    id: Int!
+    roleId: Int!
+  }
+
+  type AgencyUserService {
+    id: Int!
+    serviceId: Int!
+    agencyUserId: Int!
   }
 
   type Client {
     id: Int!
     userId: Int!
+    user: User
     approvedAt: String
     fullName: String!
     city: String!
@@ -18,6 +38,17 @@ const typeDefs = gql`
     postalCode: String!
     state: String!
     phoneNumber: String
+  }
+
+  type InternalUser {
+    id: Int!
+    user: User
+    roles: [InternalUserRole]
+  }
+
+  type InternalUserRole {
+    id: Int!
+    roleId: Int!
   }
 
   type User {
@@ -70,6 +101,7 @@ const typeDefs = gql`
   type Query {
     services: [Service]
     visit(id: Int!): Visit
+    myUser: User
   }
 `;
 
