@@ -29,7 +29,7 @@ app.use(
       jwksUri: `https://${process.env.TENANT}.auth0.com/.well-known/jwks.json`,
     }),
 
-    audience: process.env.AUDIENCE,
+    // audience: 'not-specified', (ex: helpers-consumer-test)
     issuer: `https://${process.env.TENANT}.auth0.com/`,
     algorithms: ["RS256"],
   })
