@@ -104,6 +104,7 @@ const typeDefs = gql`
   }
 
   type Query {
+    activeVisits: [Visit]
     agencies: [Agency]
     agency(id: Int!): Agency
     clients: [Client]

@@ -16,6 +16,20 @@ const prisma = new PrismaClient();
 
 const resolvers = {
   Query: {
+    activeVisits: async (_, __, context: Context) => {
+      prisma.visits.findMany({
+        where: {
+          cancelledAt: null,
+          finishedAt: null,
+          releasedAt: {
+            not: null,
+          },
+          Users: {
+            auth0Id: context.user.sub, // Only readable by visit creator
+          },
+        },
+      });
+    },
     agencies: () => prisma.agencies.findMany(),
     agency: (_, { id }) => prisma.agencies.findFirst({ where: { id } }),
     clients: () => prisma.clients.findMany(),
