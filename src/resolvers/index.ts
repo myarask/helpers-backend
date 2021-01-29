@@ -15,6 +15,19 @@ type Context = {
 const prisma = new PrismaClient();
 
 const resolvers = {
+  Mutation: {
+    updateMyUser: async (_, { fullName, phoneNumber }, context: Context) => {
+      // Can't use .update because auth0Id is not unique
+      await prisma.users.updateMany({
+        where: { auth0Id: context.user.sub },
+        data: { fullName, phoneNumber },
+      });
+
+      return prisma.users.findFirst({
+        where: { auth0Id: context.user.sub },
+      });
+    },
+  },
   Query: {
     activeVisits: async (_, __, context: Context) => {
       prisma.visits.findMany({

@@ -40,6 +40,17 @@ const typeDefs = gql`
     phoneNumber: String
   }
 
+  input ClientInput {
+    fullName: String!
+    city: String!
+    country: String!
+    line1: String!
+    line2: String
+    postalCode: String!
+    state: String!
+    phoneNumber: String
+  }
+
   type InternalUser {
     id: Int!
     user: User
@@ -95,6 +106,12 @@ const typeDefs = gql`
     agencyUser: AgencyUser
   }
 
+  input VisitInput {
+    clientId: Int!
+    notes: String
+    serviceIds: [Int!]!
+  }
+
   type VisitServices {
     id: Int
     visitId: Int
@@ -115,6 +132,16 @@ const typeDefs = gql`
     visit(id: Int!): Visit
     internalUsers: [User]
     myUser: User
+  }
+
+  type Mutation {
+    createMyUser(fullName: String!, phoneNumber: String): User
+    updateMyUser(fullName: String!, phoneNumber: String): User
+    createMyClient(values: ClientInput): Client
+    draftVisit(input: VisitInput): Visit
+    releaseVisit(id: ID!): Visit
+    cancelVisit(id: ID!): Visit
+    saveMyCard(paymentMethodId: String!): String
   }
 `;
 
