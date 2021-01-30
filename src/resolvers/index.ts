@@ -5,8 +5,6 @@ const stripe = new Stripe(<string>process.env.STRIPE_KEY, {
   apiVersion: "2020-08-27",
 });
 
-// const stripe = require('stripe')(process.env.STRIPE_KEY);
-
 type Context = {
   user: {
     iss: string;
@@ -23,8 +21,62 @@ const prisma = new PrismaClient();
 
 const resolvers = {
   Mutation: {
+    draftVisit: async (_, { input }, context) => {
+      const user = await prisma.users.findFirst({
+        where: { auth0Id: context.user.sub },
+      });
+
+      const client = await prisma.clients.findUnique({
+        where: { id: input.clientId },
+      });
+
+      if (!user || !client) {
+        return null;
+      }
+
+      const visitServices = await prisma.services.findMany({
+        where: { id: { in: input.serviceIds } },
+      });
+
+      const visit = await prisma.visits.create({
+        data: {
+          userId: user.id,
+          city: client.city,
+          country: client.country,
+          line1: client.line1,
+          line2: client.line2,
+          postalCode: client.postalCode,
+          state: client.state,
+          notes: input.notes,
+          clientId: input.clientId,
+          baseFee: 1000,
+        },
+        select: {
+          id: true,
+        },
+      });
+
+      if (!visit) {
+        return;
+      }
+
+      await Promise.all(
+        visitServices.map((service) =>
+          prisma.visitServices.create({
+            data: {
+              visitId: visit.id,
+              serviceId: service.id,
+              name: service.name,
+              fee: service.fee,
+            },
+          })
+        )
+      );
+
+      return visit;
+    },
     updateMyUser: async (_, { fullName, phoneNumber }, context: Context) => {
-      // Can't use .update because auth0Id is not unique
+      // Can't use .update because auth0Id is not unique (yet)
       await prisma.users.updateMany({
         where: { auth0Id: context.user.sub },
         data: { fullName, phoneNumber },
