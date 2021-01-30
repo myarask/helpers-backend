@@ -139,8 +139,7 @@ const typeDefs = gql`
     updateMyUser(fullName: String!, phoneNumber: String): User
     createMyClient(values: ClientInput): Client
     draftVisit(input: VisitInput): Visit
-    releaseVisit(id: ID!): Visit
-    cancelVisit(id: ID!): Visit
+    releaseVisit(id: Int!): Visit
     saveMyCard(paymentMethodId: String!): String
   }
 `;
