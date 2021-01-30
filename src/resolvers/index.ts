@@ -1,4 +1,11 @@
 import { PrismaClient } from "@prisma/client";
+import Stripe from "stripe";
+
+const stripe = new Stripe(<string>process.env.STRIPE_KEY, {
+  apiVersion: "2020-08-27",
+});
+
+// const stripe = require('stripe')(process.env.STRIPE_KEY);
 
 type Context = {
   user: {
@@ -26,6 +33,48 @@ const resolvers = {
       return prisma.users.findFirst({
         where: { auth0Id: context.user.sub },
       });
+    },
+    saveMyCard: async (_, { paymentMethodId }, context) => {
+      const user = await prisma.users.findFirst({
+        where: { auth0Id: context.user.sub },
+      });
+
+      if (!user) {
+        // Should throw error instead?
+        return null;
+      }
+
+      // Add payment method to existing customer, if there is one.
+      if (user.customerId) {
+        await stripe.paymentMethods.attach(paymentMethodId, {
+          customer: user.customerId,
+        });
+
+        await stripe.customers.update(user.customerId, {
+          invoice_settings: {
+            default_payment_method: paymentMethodId,
+          },
+        });
+
+        return user.customerId;
+      }
+
+      // Create a new customer with a payment method if there is no customer ID.
+      const newCustomer = await stripe.customers.create({
+        payment_method: paymentMethodId,
+        email: user.email,
+        name: user.fullName ?? undefined,
+        invoice_settings: {
+          default_payment_method: paymentMethodId,
+        },
+      });
+
+      await prisma.users.update({
+        where: { id: user.id },
+        data: { customerId: newCustomer.id },
+      });
+
+      return newCustomer.id;
     },
   },
   Query: {
