@@ -130,40 +130,19 @@ const resolvers = {
       // it doesn't need to be retrieved from stripe
       const customer = await stripe.customers.retrieve(user.customerId);
 
-      if (!customer) {
-        throw new ApolloError(
-          `Could not retrieve customer from stripe`,
-          "STRIPE"
-        );
-      }
-
       if (customer.deleted) {
         throw new ApolloError(`Customer has beed deleted`, "STRIPE");
       }
-
-      // if (!customer.default_source) {
-      //   throw new ApolloError(
-      //     `Customer does not have a default payment method`,
-      //     "STRIPE"
-      //   );
-      // }
-
-      console.log(customer);
 
       const paymentIntent = await stripe.paymentIntents.create({
         amount,
         currency: "cad",
         customer: user.customerId,
         confirm: true,
-        // payment_method: customer.default_source.toString(),
         payment_method: <string>(
           customer.invoice_settings.default_payment_method
         ),
       });
-
-      if (!paymentIntent) {
-        throw new ApolloError(`Failed to create payment intent`, "STRIPE");
-      }
 
       return prisma.visits.update({
         where: { id },
@@ -172,13 +151,6 @@ const resolvers = {
           paymentIntentId: paymentIntent.id,
         },
       });
-      // return models.Visit.update(
-      //   {
-      //     releasedAt: models.sequelize.literal("CURRENT_TIMESTAMP"),
-      //     paymentIntentId: paymentIntent.id,
-      //   },
-      //   { where: { id } }
-      // );
     },
     updateMyUser: async (_, { fullName, phoneNumber }, context: Context) => {
       // Can't use .update because auth0Id is not unique (yet)
@@ -235,8 +207,8 @@ const resolvers = {
     },
   },
   Query: {
-    activeVisits: async (_, __, context: Context) => {
-      prisma.visits.findMany({
+    activeVisits: (_, __, context: Context) => {
+      return prisma.visits.findMany({
         where: {
           cancelledAt: null,
           finishedAt: null,
