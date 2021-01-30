@@ -169,8 +169,7 @@ const resolvers = {
       });
 
       if (!user) {
-        // Should throw error instead?
-        return null;
+        throw new ApolloError(`This user does not exist`, "MISSING_DATA");
       }
 
       // Add payment method to existing customer, if there is one.
