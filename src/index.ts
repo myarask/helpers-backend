@@ -8,6 +8,7 @@ import express from "express";
 import { ApolloServer } from "apollo-server-express";
 import typeDefs from "./typeDefs";
 import resolvers from "./resolvers/index";
+import cors from "cors";
 
 const server = new ApolloServer({
   typeDefs,
@@ -18,6 +19,8 @@ const server = new ApolloServer({
 });
 
 const app = express();
+
+app.use(cors());
 
 // Forces calls to have a valid token in the Authorization header
 app.use(
