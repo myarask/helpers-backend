@@ -2,8 +2,8 @@ name: Deploy
 on:
   push:
     branches:
-    - release-test
-    - release-prod
+    - release/test
+    - release/prod
 
 jobs:
   build:
