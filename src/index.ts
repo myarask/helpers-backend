@@ -17,6 +17,7 @@ import jwtStrategy from "./passport/config";
 import { errorConverter, errorHandler } from "./middlewares/error";
 import { ApiError } from "./utils/catchAsync";
 import auth from "./middlewares/auth";
+import CONFIG from './config/config'
 
 
 const server = new ApolloServer({
@@ -38,7 +39,7 @@ app.use(passport.initialize());
 passport.use('jwt', jwtStrategy);
 
 const router = routes(express.Router());
-app.use(router)
+app.use('/api', router)
 // TODO: Check security concerns
 app.use('/api/graphql', auth());
 server.applyMiddleware({ app, path: "/api/graphql" });
@@ -49,8 +50,7 @@ app.use((req, res, next) => {
 app.use(errorConverter);
 app.use(errorHandler);
 
-const PORT = process.env.PORT || 4000;
 
-app.listen({ port: PORT }, () =>
-  console.log(`🚀 Server ready at http://localhost:${PORT}${server.graphqlPath}`)
+app.listen({ port: CONFIG.port }, () =>
+  console.log(`🚀 Server ready at http://localhost:${CONFIG.port}${server.graphqlPath}`)
 );
