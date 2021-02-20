@@ -1,4 +1,6 @@
 import httpStatus from "http-status";
+import { formatISO } from "date-fns";
+import { hashPassword } from "../utils/userPassword";
 import prismaClient from '../prismaClient'
 import { ApiError } from "../utils/catchAsync";
 
@@ -13,13 +15,17 @@ const createUser = async (userBody) => {
     throw new ApiError(httpStatus.BAD_REQUEST, 'This email is already in use. Please login');
   }
 
-  // const user = await prismaClient.users.create({
-  //   data: {
-  //     email: userBody.email,
-  //     // password: hashPassword(userBody.password)
-  //   }
-  // });
-  // return user;
+  const slatedPassword = await hashPassword(userBody.password)
+  const user = await prismaClient.users.create({
+    data: {
+      email: userBody.email,
+      createdAt: formatISO(new Date()),
+      updatedAt: formatISO(new Date()),
+      password: slatedPassword
+    }
+  })
+
+  return user;
 };
 
 /**
@@ -27,8 +33,21 @@ const createUser = async (userBody) => {
  * @param {string} email
  * @returns {Promise<User>}
  */
-const getUserByEmail = async (email) => {
+const getUserByEmail = async (email: string) => {
   const user = await prismaClient.users.findUnique({ where: { email } });
+  if (!user) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
+  }
+  return user;
+};
+
+/**
+ * Get user by id
+ * @param {number} email
+ * @returns {Promise<User>}
+ */
+const getUserById = async (id : number) => {
+  const user = await prismaClient.users.findUnique({ where: { id } });
   if (!user) {
     throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
   }
@@ -38,6 +57,7 @@ const getUserByEmail = async (email) => {
 
 const userService = {
   createUser,
+  getUserById,
   getUserByEmail,
 };
 

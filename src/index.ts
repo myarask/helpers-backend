@@ -2,10 +2,9 @@ import * as dotenv from "dotenv";
 import path from "path";
 dotenv.config({ path: path.resolve(__dirname, "../.env") });
 
-import jwt from "express-jwt";
 import cors from "cors";
-import jwksRsa from "jwks-rsa";
 import passport from "passport";
+import bodyParser from "body-parser";
 import xss from "xss-clean";
 import httpStatus from "http-status";
 import express from "express";
@@ -13,9 +12,11 @@ import helmet from "helmet";
 import { ApolloServer } from "apollo-server-express";
 import typeDefs from "./typeDefs";
 import resolvers from "./resolvers/index";
+import routes from './routes';
 import jwtStrategy from "./passport/config";
 import { errorConverter, errorHandler } from "./middlewares/error";
 import { ApiError } from "./utils/catchAsync";
+import auth from "./middlewares/auth";
 
 
 const server = new ApolloServer({
@@ -31,30 +32,19 @@ const app = express();
 app.use(cors());
 app.use(xss());
 app.use(helmet());
+app.use(bodyParser.json());
 
 app.use(passport.initialize());
 passport.use('jwt', jwtStrategy);
 
-// Forces calls to have a valid token in the Authorization header
-app.use(
-  jwt({
-    secret: jwksRsa.expressJwtSecret({
-      cache: true,
-      rateLimit: true,
-      jwksRequestsPerMinute: 5,
-      jwksUri: `https://${process.env.TENANT}.auth0.com/.well-known/jwks.json`,
-    }),
+const router = routes(express.Router());
+app.use(router)
 
-    // audience: 'not-specified', (ex: helpers-consumer-test)
-    issuer: `https://${process.env.TENANT}.auth0.com/`,
-    algorithms: ["RS256"],
-  })
-);
+app.use('/api/graphql', auth());
 server.applyMiddleware({ app, path: "/api/graphql" });
 
-
 app.use((req, res, next) => {
-  next(new ApiError(httpStatus.NOT_FOUND, 'Not found'));
+  next(new ApiError(httpStatus.NOT_FOUND, 'No route found'));
 });
 app.use(errorConverter);
 app.use(errorHandler);

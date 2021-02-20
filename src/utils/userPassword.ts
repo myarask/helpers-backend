@@ -14,8 +14,8 @@ const hashPassword = async (password: string) => {
  * @param password password from DB
  * @param userProvidedPassword user's provided password
  */
-const compareHashPassword = (password, userProvidedPassword) => {
-  return bcrypt.compare(password, userProvidedPassword);
+const compareHashPassword = async (password, dbPass) => {
+  return bcrypt.compare(password, dbPass);
 }
 
 export {

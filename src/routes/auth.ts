@@ -2,7 +2,7 @@ import authValidation from "../validations/auth.validation";
 import validate from "../middlewares/validate";
 import authController from "../controllers/auth.controller";
 
-module.exports = (router) => {
+export default (router) => {
   router.post("/login", validate(authValidation.login), authController.login);
   router.post(
     "/logout",
@@ -14,5 +14,6 @@ module.exports = (router) => {
     validate(authValidation.refreshTokens),
     authController.refreshTokens
   );
-  return router;
+
+  return router
 };

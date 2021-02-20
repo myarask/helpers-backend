@@ -1,14 +1,16 @@
 import moment from "moment";
-import jwt from 'jsonwebtoken';
+import { formatISO } from "date-fns";
+import jwt from "jsonwebtoken";
+import prismaClient from "../prismaClient";
 import { TOKEN_TYPES } from "../passport/config";
 
 const config = {
   jwt: {
     secret: process.env.JWT_SECRET,
     accessExpirationMinutes: process.env.JWT_ACCESS_EXPIRATION_MINUTES,
-    refreshExpirationDays: process.env.JWT_REFRESH_EXPIRATION_DAYS
-  }
-}
+    refreshExpirationDays: process.env.JWT_REFRESH_EXPIRATION_DAYS,
+  },
+};
 
 /**
  * Generate token
@@ -37,12 +39,16 @@ const generateToken = (userId, expires, type, secret = config.jwt.secret) => {
  * @returns {Promise<Token>}
  */
 const saveToken = async (token, userId, expires, type, blacklisted = false) => {
-  const tokenDoc = await Token.create({
-    token,
-    user: userId,
-    expires: expires.toDate(),
-    type,
-    blacklisted,
+  const tokenDoc = await prismaClient.tokens.create({
+    data: {
+      token,
+      userId: userId,
+      expiresAt: expires.toISOString(),
+      createdAt: formatISO(new Date()),
+      updatedAt: formatISO(new Date()),
+      type,
+      blacklisted,
+    },
   });
   return tokenDoc;
 };
@@ -55,11 +61,32 @@ const saveToken = async (token, userId, expires, type, blacklisted = false) => {
  */
 const verifyToken = async (token, type) => {
   const payload = jwt.verify(token, config.jwt.secret);
-  const tokenDoc = await Token.findOne({ token, type, user: payload.sub, blacklisted: false });
+  const tokenDoc = await prismaClient.tokens.findFirst({
+    where: {
+      token,
+      type,
+      userId: payload.sub,
+      blacklisted: false,
+    },
+  });
+
   if (!tokenDoc) {
-    throw new Error('Token not found');
+    throw new Error("Token not found");
   }
   return tokenDoc;
+};
+
+/**
+ * Delete token by ID
+ * @param {number} id
+ * @returns {Promise<Token>}
+ */
+const deleteTokenById = async (id) => {
+  await prismaClient.tokens.delete({
+    where: {
+      id,
+    },
+  });
 };
 
 /**
@@ -68,12 +95,31 @@ const verifyToken = async (token, type) => {
  * @returns {Promise<Object>}
  */
 const generateAuthTokens = async (user) => {
-  const accessTokenExpires = moment().add(config.jwt.accessExpirationMinutes, 'minutes');
-  const accessToken = generateToken(user.id, accessTokenExpires, TOKEN_TYPES.ACCESS);
+  const accessTokenExpires = moment().add(
+    config.jwt.accessExpirationMinutes,
+    "minutes"
+  );
+  const accessToken = generateToken(
+    user.id,
+    accessTokenExpires,
+    TOKEN_TYPES.ACCESS
+  );
 
-  const refreshTokenExpires = moment().add(config.jwt.refreshExpirationDays, 'days');
-  const refreshToken = generateToken(user.id, refreshTokenExpires, TOKEN_TYPES.REFRESH);
-  await saveToken(refreshToken, user.id, refreshTokenExpires, TOKEN_TYPES.REFRESH);
+  const refreshTokenExpires = moment().add(
+    config.jwt.refreshExpirationDays,
+    "days"
+  );
+  const refreshToken = generateToken(
+    user.id,
+    refreshTokenExpires,
+    TOKEN_TYPES.REFRESH
+  );
+  await saveToken(
+    refreshToken,
+    user.id,
+    refreshTokenExpires,
+    TOKEN_TYPES.REFRESH
+  );
 
   return {
     access: {
@@ -90,6 +136,7 @@ const generateAuthTokens = async (user) => {
 const tokenService = {
   generateToken,
   saveToken,
+  deleteTokenById,
   verifyToken,
   generateAuthTokens,
 };
