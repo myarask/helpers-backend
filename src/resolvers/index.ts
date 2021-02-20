@@ -18,6 +18,9 @@ type Context = {
     azp: string;
     scope: string;
   };
+  myUser: {
+    id: number
+  }
 };
 
 
@@ -25,7 +28,7 @@ const resolvers = {
   Mutation: {
     draftVisit: async (_, { input }, context) => {
       const user = await prisma.users.findFirst({
-        where: { auth0Id: context.user.sub },
+        where: { id: context.myUser.id },
       });
 
       const client = await prisma.clients.findUnique({
@@ -79,7 +82,7 @@ const resolvers = {
     },
     releaseVisit: async (_, { id }, context) => {
       const user = await prisma.users.findFirst({
-        where: { auth0Id: context.user.sub },
+        where: { id: context.myUser.id },
       });
 
       if (!user) {
@@ -153,19 +156,16 @@ const resolvers = {
       });
     },
     updateMyUser: async (_, { fullName, phoneNumber }, context: Context) => {
-      // Can't use .update because auth0Id is not unique (yet)
-      await prisma.users.updateMany({
-        where: { auth0Id: context.user.sub },
+      return prisma.users.update({
+        where: {
+          id: context.myUser.id
+        },
         data: { fullName, phoneNumber },
-      });
-
-      return prisma.users.findFirst({
-        where: { auth0Id: context.user.sub },
-      });
+      })
     },
     saveMyCard: async (_, { paymentMethodId }, context) => {
       const user = await prisma.users.findFirst({
-        where: { auth0Id: context.user.sub },
+        where: { id: context.myUser.id},
       });
 
       if (!user) {
@@ -215,7 +215,7 @@ const resolvers = {
             not: null,
           },
           Users: {
-            auth0Id: context.user.sub, // Only readable by visit creator
+            id: context.myUser.id, // Only readable by visit creator
           },
         },
       });
@@ -235,12 +235,12 @@ const resolvers = {
         where: {
           id,
           Users: {
-            auth0Id: context.user.sub, // Only readable by visit creator
+            id: context.myUser.id // Only readable by visit creator
           },
         },
       }),
     myUser: (_, __, context: Context) =>
-      prisma.users.findFirst({ where: { auth0Id: context.user.sub } }),
+      prisma.users.findFirst({ where: { id: context.myUser.id } }),
   },
   Client: {
     user: ({ id }) => prisma.clients.findUnique({ where: { id } }).Users(),
