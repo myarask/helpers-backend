@@ -1,12 +1,13 @@
 import httpStatus from "http-status";
 import { catchAsync } from "../utils/catchAsync";
 import { authService, tokenService } from "../services";
+import sanitizeUser from "../utils/sanitizeUser";
 
 const login = catchAsync(async (req, res) => {
   const { email, password } = req.body;
   const user = await authService.loginUserWithEmailAndPassword(email, password);
   const tokens = await tokenService.generateAuthTokens(user);
-  res.send({ user, tokens });
+  res.send({ user: sanitizeUser(user), tokens });
 });
 
 const logout = catchAsync(async (req, res) => {
