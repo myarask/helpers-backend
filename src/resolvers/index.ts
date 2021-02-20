@@ -1,9 +1,10 @@
 import { ApolloError } from "apollo-server-express";
 import prisma from '../prismaClient'
+import CONFIG from '../config/config'
 import { formatISO } from "date-fns";
 import Stripe from "stripe";
 
-const stripe = new Stripe(<string>process.env.STRIPE_KEY, {
+const stripe = new Stripe(<string>CONFIG.stripeKey, {
   apiVersion: "2020-08-27",
 });
 

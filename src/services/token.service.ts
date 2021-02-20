@@ -3,14 +3,7 @@ import { formatISO } from "date-fns";
 import jwt from "jsonwebtoken";
 import prismaClient from "../prismaClient";
 import { TOKEN_TYPES } from "../passport/config";
-
-const config = {
-  jwt: {
-    secret: process.env.JWT_SECRET,
-    accessExpirationMinutes: process.env.JWT_ACCESS_EXPIRATION_MINUTES,
-    refreshExpirationDays: process.env.JWT_REFRESH_EXPIRATION_DAYS,
-  },
-};
+import CONFIG from '../config/config'
 
 /**
  * Generate token
@@ -19,7 +12,7 @@ const config = {
  * @param {string} [secret]
  * @returns {string}
  */
-const generateToken = (userId, expires, type, secret = config.jwt.secret) => {
+const generateToken = (userId, expires, type, secret = CONFIG.jwt.secret) => {
   const payload = {
     sub: userId,
     iat: moment().unix(),
@@ -60,7 +53,7 @@ const saveToken = async (token, userId, expires, type, blacklisted = false) => {
  * @returns {Promise<Token>}
  */
 const verifyToken = async (token, type) => {
-  const payload = jwt.verify(token, config.jwt.secret);
+  const payload = jwt.verify(token, CONFIG.jwt.secret);
   const tokenDoc = await prismaClient.tokens.findFirst({
     where: {
       token,
@@ -96,7 +89,7 @@ const deleteTokenById = async (id) => {
  */
 const generateAuthTokens = async (user) => {
   const accessTokenExpires = moment().add(
-    config.jwt.accessExpirationMinutes,
+    CONFIG.jwt.accessExpirationMinutes,
     "minutes"
   );
   const accessToken = generateToken(
@@ -106,7 +99,7 @@ const generateAuthTokens = async (user) => {
   );
 
   const refreshTokenExpires = moment().add(
-    config.jwt.refreshExpirationDays,
+    CONFIG.jwt.refreshExpirationDays,
     "days"
   );
   const refreshToken = generateToken(

@@ -1,4 +1,5 @@
 import { ExtractJwt, Strategy as JwtStrategy } from 'passport-jwt'
+import CONFIG from '../config/config'
 import prisma from '../prismaClient'
 
 enum TOKEN_TYPES {
@@ -7,7 +8,7 @@ enum TOKEN_TYPES {
 }
 
 const jwtOptions = {
-  secretOrKey: process.env.JWT_SECRET,
+  secretOrKey: CONFIG.jwt.secret,
   jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
 };
 

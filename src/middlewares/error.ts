@@ -1,9 +1,6 @@
 import httpStatus from "http-status";
 import { ApiError } from "../utils/catchAsync";
-
-const config = {
-  env: "development"
-}
+import CONFIG from '../config/config'
 
 const errorConverter = (err, req, res, next) => {
   let error = err;
@@ -21,7 +18,7 @@ const errorConverter = (err, req, res, next) => {
 // eslint-disable-next-line no-unused-vars
 const errorHandler = (err, req, res, next) => {
   let { statusCode, message } = err;
-  if (config.env === "production" && !err.isOperational) {
+  if (CONFIG.env === "production" && !err.isOperational) {
     statusCode = httpStatus.INTERNAL_SERVER_ERROR;
     message = httpStatus[httpStatus.INTERNAL_SERVER_ERROR];
   }
@@ -31,10 +28,10 @@ const errorHandler = (err, req, res, next) => {
   const response = {
     code: statusCode,
     message,
-    ...(config.env === "development" && { stack: err.stack }),
+    ...(CONFIG.env === "development" && { stack: err.stack }),
   };
 
-  if (config.env === "development") {
+  if (CONFIG.env === "development") {
     console.error(err);
   }
 
