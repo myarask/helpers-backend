@@ -16,7 +16,6 @@
     "noUnusedParameters": false,
     "moduleResolution": "node",
     "sourceMap": true,
-    "resolveJsonModule": true,
     "outDir": "dist",
     "baseUrl": ".",
     "paths": {
