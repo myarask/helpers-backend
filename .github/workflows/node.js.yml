@@ -68,7 +68,7 @@ jobs:
         aws_access_key: ${{ secrets.AWS_ACCESS_KEY }}
         aws_secret_key: ${{ secrets.AWS_ACCESS_SECRET_KEY }}
         application_name: helpers-backend
-        environment_name: HelpersBackendProd
+        environment_name: Helpersbackend-env
         version_label: "version-${{ steps.format-time.outputs.replaced }}"
         region: ca-central-1
         deployment_package: deploy.zip
