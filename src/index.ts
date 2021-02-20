@@ -18,7 +18,6 @@ import { errorConverter, errorHandler } from "./middlewares/error";
 import { ApiError } from "./utils/catchAsync";
 import auth from "./middlewares/auth";
 import CONFIG from './config/config'
-import { version } from '../package.json'
 
 
 const server = new ApolloServer({
@@ -43,7 +42,7 @@ const router = routes(express.Router());
 app.use('/api', router)
 
 app.get("/", (req, res) => {
-  res.json({ Message: `Server running on ${version}` });
+  res.json({ Message: `Server is running` });
 });
 // TODO: Check security concerns
 app.use('/api/graphql', auth());
