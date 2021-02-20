@@ -32,7 +32,7 @@ const app = express();
 
 app.use(cors());
 app.use(xss());
-app.use(helmet());
+app.use(helmet({ contentSecurityPolicy: (CONFIG.env === 'production') ? undefined : false }));
 app.use(bodyParser.json());
 
 app.use(passport.initialize());
