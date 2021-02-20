@@ -39,7 +39,7 @@ passport.use('jwt', jwtStrategy);
 
 const router = routes(express.Router());
 app.use(router)
-
+// TODO: Check security concerns
 app.use('/api/graphql', auth());
 server.applyMiddleware({ app, path: "/api/graphql" });
 
