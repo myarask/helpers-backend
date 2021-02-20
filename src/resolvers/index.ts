@@ -18,7 +18,7 @@ type Context = {
     azp: string;
     scope: string;
   };
-  currentUser: {
+  myUser: {
     id: number
   }
 };
@@ -28,7 +28,7 @@ const resolvers = {
   Mutation: {
     draftVisit: async (_, { input }, context) => {
       const user = await prisma.users.findFirst({
-        where: { id: context.currentUser.id },
+        where: { id: context.myUser.id },
       });
 
       const client = await prisma.clients.findUnique({
@@ -82,7 +82,7 @@ const resolvers = {
     },
     releaseVisit: async (_, { id }, context) => {
       const user = await prisma.users.findFirst({
-        where: { id: context.currentUser.id },
+        where: { id: context.myUser.id },
       });
 
       if (!user) {
@@ -158,14 +158,14 @@ const resolvers = {
     updateMyUser: async (_, { fullName, phoneNumber }, context: Context) => {
       return prisma.users.update({
         where: {
-          id: context.currentUser.id
+          id: context.myUser.id
         },
         data: { fullName, phoneNumber },
       })
     },
     saveMyCard: async (_, { paymentMethodId }, context) => {
       const user = await prisma.users.findFirst({
-        where: { id: context.currentUser.id},
+        where: { id: context.myUser.id},
       });
 
       if (!user) {
@@ -215,7 +215,7 @@ const resolvers = {
             not: null,
           },
           Users: {
-            id: context.currentUser.id, // Only readable by visit creator
+            id: context.myUser.id, // Only readable by visit creator
           },
         },
       });
@@ -235,12 +235,12 @@ const resolvers = {
         where: {
           id,
           Users: {
-            id: context.currentUser.id // Only readable by visit creator
+            id: context.myUser.id // Only readable by visit creator
           },
         },
       }),
     myUser: (_, __, context: Context) =>
-      prisma.users.findFirst({ where: { id: context.currentUser.id } }),
+      prisma.users.findFirst({ where: { id: context.myUser.id } }),
   },
   Client: {
     user: ({ id }) => prisma.clients.findUnique({ where: { id } }).Users(),
