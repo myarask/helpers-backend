@@ -1,5 +1,5 @@
 generator client {
-  provider      = "prisma-client-js"
+  provider = "prisma-client-js"
   binaryTargets = ["native", "rhel-openssl-1.0.x"]
 }
 
@@ -122,19 +122,33 @@ model Services {
   VisitServices      VisitServices[]
 }
 
+model Tokens {
+  id          Int      @id @default(autoincrement())
+  createdAt   DateTime
+  updatedAt   DateTime
+  expiresAt   DateTime
+  userId      Int
+  token       String
+  type        String
+  blacklisted Boolean
+  Users       Users    @relation(fields: [userId], references: [id])
+}
+
 model Users {
   id            Int             @id @default(autoincrement())
   createdAt     DateTime
   updatedAt     DateTime
   email         String          @unique
   fullName      String?
-  auth0Id       String?
+  auth0Id       String?         @unique
   deletedAt     DateTime?
   customerId    String?
   phoneNumber   String?
+  password      String?
   AgencyUsers   AgencyUsers[]
   Clients       Clients[]
   InternalUsers InternalUsers[]
+  Tokens        Tokens[]
   Visits        Visits[]
 }
 

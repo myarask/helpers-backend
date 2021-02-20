@@ -1,5 +1,5 @@
-import { PrismaClient } from "@prisma/client";
 import { ApolloError } from "apollo-server-express";
+import prisma from '../prismaClient'
 import { formatISO } from "date-fns";
 import Stripe from "stripe";
 
@@ -19,7 +19,6 @@ type Context = {
   };
 };
 
-const prisma = new PrismaClient();
 
 const resolvers = {
   Mutation: {
