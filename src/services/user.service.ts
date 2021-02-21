@@ -15,6 +15,10 @@ const createUser = async (userBody) => {
     throw new ApiError(httpStatus.BAD_REQUEST, 'This email is already in use. Please login');
   }
 
+  if (!userBody.password) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Please provide proper password');
+  }
+
   const slatedPassword = await hashPassword(userBody.password)
   const user = await prismaClient.users.create({
     data: {
@@ -54,10 +58,26 @@ const getUserById = async (id : number) => {
   return user;
 };
 
+/**
+ * Update user by id
+ * @param {number} id
+ * @param {number} userBody
+ * @returns {Promise<User>}
+ */
+const updateUserById = async (id : number, userBody: any) => {
+  const user = await prismaClient.users.findUnique({ where: { id } });
+  if (!user) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
+  }
+  return prismaClient.users.update({ where: { id }, data: userBody });
+};
+
+
 
 const userService = {
   createUser,
   getUserById,
+  updateUserById,
   getUserByEmail,
 };
 

@@ -5,6 +5,7 @@ import prisma from '../prismaClient'
 enum TOKEN_TYPES {
   ACCESS = 'access',
   REFRESH = 'refresh',
+  RESET_PASSWORD = 'reset-password'
 }
 
 const jwtOptions = {
