@@ -3,7 +3,7 @@ import { tokenService, userService } from "./index";
 import { ApiError } from "../utils/catchAsync";
 import TOKEN_TYPES from "../passport/config";
 import prismaClient from "../prismaClient";
-import { compareHashPassword } from "../utils/userPassword";
+import { compareHashPassword, hashPassword } from "../utils/userPassword";
 
 /**
  * Login with username and OTP
@@ -58,10 +58,36 @@ const refreshAuth = async (refreshToken) => {
   }
 };
 
+/**
+ * Reset password
+ * @param {string} resetPasswordToken
+ * @param {string} newPassword
+ * @returns {Promise}
+ */
+const resetPassword = async (resetPasswordToken, newPassword) => {
+  if (!newPassword) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Please provide new password');
+  }
+
+  try {
+    const resetPasswordTokenDoc = await tokenService.verifyToken(resetPasswordToken, TOKEN_TYPES.RESET_PASSWORD);
+    const user = await userService.getUserById(resetPasswordTokenDoc.userId);
+    if (!user) {
+      throw new Error();
+    }
+    const slatedPassword = await hashPassword(newPassword)
+    await userService.updateUserById(user.id, { password: slatedPassword });
+    await prismaClient.tokens.deleteMany({ where: { userId: user.id, type: TOKEN_TYPES.RESET_PASSWORD }});
+  } catch (error) {
+    throw new ApiError(httpStatus.UNAUTHORIZED, 'Password reset failed');
+  }
+};
+
 const authService = {
   loginUserWithEmailAndPassword,
   logout,
   refreshAuth,
+  resetPassword,
 }
 
 export default authService;
