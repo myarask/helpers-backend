@@ -3,6 +3,7 @@ import { formatISO } from "date-fns";
 import { hashPassword } from "../utils/userPassword";
 import prismaClient from '../prismaClient'
 import { ApiError } from "../utils/catchAsync";
+import emailService from "./email.service";
 
 /**
  * Create a user
@@ -28,6 +29,11 @@ const createUser = async (userBody) => {
       password: slatedPassword
     }
   })
+
+  const subject = 'Welcome to getHelpers';
+  const text = 'Welcome email text'
+  // TODO: Update text
+  await emailService.sendEmail(userBody.email, subject, text)
 
   return user;
 };
