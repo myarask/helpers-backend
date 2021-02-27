@@ -11,7 +11,6 @@ const envVarsSchema = Joi.object()
     PORT: Joi.number().default(4000),
     DATABASE_URL: Joi.string().required().description("DATABASE_URL"),
     STRIPE_KEY: Joi.string().required().description("STRIPE_KEY"),
-    TENANT: Joi.string().required().description("TENANT"),
     JWT_SECRET: Joi.string().required().description("JWT secret key"),
     JWT_ACCESS_EXPIRATION_MINUTES: Joi.number()
       .default(30)
@@ -42,7 +41,6 @@ export default {
   env: envVars.NODE_ENV,
   databaseUrl: envVars.DATABASE_URL,
   stripeKey: envVars.STRIPE_KEY,
-  tenant: envVars.TENANT,
   port: envVars.PORT,
   jwt: {
     secret: envVars.JWT_SECRET,

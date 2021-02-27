@@ -7,7 +7,9 @@
     "dev": "nodemon",
     "start": "node dist/index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "npx tsc"
+    "clean": "rm -rf ./dist",
+    "copy-files": "cp ./src/views/*.html ./dist/views/",
+    "build": "npm run clean && npx tsc && npm run copy-files"
   },
   "author": "",
   "license": "ISC",
