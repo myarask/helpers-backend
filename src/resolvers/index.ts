@@ -220,12 +220,7 @@ const resolvers = {
       });
     },
     myOpenVisits: async (_, __, context: Context) => {
-      // Broken
-      // const userId = context.myUser.id;
-
-      // const { id: agencyUserId } = await models.AgencyUser.findOne({
-      //   where: { userId, agencyId },
-      // });
+      // Visits that a PSW is allowed to take
       const userServices = await prisma.agencyUserServices.findMany({
         where: {
           AgencyUsers: {
@@ -236,32 +231,9 @@ const resolvers = {
         },
       });
 
-      console.log(userServices);
-      // const allowedIds = userServices.map((service) => service.serviceId);
+      const allowedIds = userServices.map((service) => service.serviceId);
 
-      // const visits = await models.Visit.findAll({
-      //   where: {
-      //     matchedAt: null,
-      //     cancelledAt: null,
-      //     releasedAt: {
-      //       [Op.not]: null,
-      //     },
-      //   },
-      //   include: [
-      //     {
-      //       model: models.VisitService,
-      //       required: false,
-      //     },
-      //   ],
-      // });
-
-      // return visits.filter((visit) =>
-      //   visit.dataValues.VisitServices.every((service) =>
-      //     allowedIds.includes(service.serviceId)
-      //   )
-      // );
-
-      return prisma.visits.findMany({
+      const visits = await prisma.visits.findMany({
         where: {
           agencyUserId: null,
           matchedAt: null,
@@ -270,7 +242,16 @@ const resolvers = {
             not: null,
           },
         },
+        include: {
+          VisitServices: true,
+        },
       });
+
+      return visits.filter((visit) =>
+        visit.VisitServices.every((service) =>
+          allowedIds.includes(service.serviceId)
+        )
+      );
     },
     activeVisits: (_, __, context: Context) => {
       // The active visits of a consumer
