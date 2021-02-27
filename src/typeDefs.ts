@@ -132,6 +132,8 @@ const typeDefs = gql`
     visit(id: Int!): Visit
     internalUsers: [User]
     myUser: User
+    myVisit: Visit
+    myOpenVisits: [Visit]
   }
 
   type Mutation {

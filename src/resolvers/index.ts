@@ -1,6 +1,6 @@
 import { ApolloError } from "apollo-server-express";
-import prisma from '../prismaClient'
-import CONFIG from '../config/config'
+import prisma from "../prismaClient";
+import CONFIG from "../config/config";
 import { formatISO } from "date-fns";
 import Stripe from "stripe";
 
@@ -19,10 +19,9 @@ type Context = {
     scope: string;
   };
   myUser: {
-    id: number
-  }
+    id: number;
+  };
 };
-
 
 const resolvers = {
   Mutation: {
@@ -158,14 +157,14 @@ const resolvers = {
     updateMyUser: async (_, { fullName, phoneNumber }, context: Context) => {
       return prisma.users.update({
         where: {
-          id: context.myUser.id
+          id: context.myUser.id,
         },
         data: { fullName, phoneNumber },
-      })
+      });
     },
     saveMyCard: async (_, { paymentMethodId }, context) => {
       const user = await prisma.users.findFirst({
-        where: { id: context.myUser.id},
+        where: { id: context.myUser.id },
       });
 
       if (!user) {
@@ -206,7 +205,75 @@ const resolvers = {
     },
   },
   Query: {
+    myVisit: async (_, __, context: Context) => {
+      // The visit that a PSW is currently assigned to
+      const userId = context.myUser.id;
+
+      return prisma.visits.findFirst({
+        where: {
+          finishedAt: null,
+          cancelledAt: null,
+          AgencyUsers: {
+            userId,
+          },
+        },
+      });
+    },
+    myOpenVisits: async (_, __, context: Context) => {
+      // Broken
+      // const userId = context.myUser.id;
+
+      // const { id: agencyUserId } = await models.AgencyUser.findOne({
+      //   where: { userId, agencyId },
+      // });
+      const userServices = await prisma.agencyUserServices.findMany({
+        where: {
+          AgencyUsers: {
+            Users: {
+              id: context.myUser.id,
+            },
+          },
+        },
+      });
+
+      console.log(userServices);
+      // const allowedIds = userServices.map((service) => service.serviceId);
+
+      // const visits = await models.Visit.findAll({
+      //   where: {
+      //     matchedAt: null,
+      //     cancelledAt: null,
+      //     releasedAt: {
+      //       [Op.not]: null,
+      //     },
+      //   },
+      //   include: [
+      //     {
+      //       model: models.VisitService,
+      //       required: false,
+      //     },
+      //   ],
+      // });
+
+      // return visits.filter((visit) =>
+      //   visit.dataValues.VisitServices.every((service) =>
+      //     allowedIds.includes(service.serviceId)
+      //   )
+      // );
+
+      return prisma.visits.findMany({
+        where: {
+          agencyUserId: null,
+          matchedAt: null,
+          cancelledAt: null,
+          releasedAt: {
+            not: null,
+          },
+        },
+      });
+    },
     activeVisits: (_, __, context: Context) => {
+      // The active visits of a consumer
       return prisma.visits.findMany({
         where: {
           cancelledAt: null,
@@ -235,7 +302,7 @@ const resolvers = {
         where: {
           id,
           Users: {
-            id: context.myUser.id // Only readable by visit creator
+            id: context.myUser.id, // Only readable by visit creator
           },
         },
       }),
