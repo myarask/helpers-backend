@@ -26,5 +26,11 @@ export default (router) => {
     authController.resetPassword
   );
 
+  router.get(
+    "/reset-password",
+    validate(authValidation.resetPasswordPage),
+    authController.resetPasswordPage
+  );
+
   return router;
 };
