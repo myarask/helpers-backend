@@ -33,6 +33,7 @@
     "passport": "^0.4.1",
     "passport-jwt": "^4.0.0",
     "stripe": "^8.132.0",
+    "trackjs": "^3.8.0",
     "xss-clean": "^0.1.1"
   },
   "devDependencies": {

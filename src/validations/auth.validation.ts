@@ -35,11 +35,18 @@ const resetPassword = {
   }),
 };
 
+const resetPasswordPage = {
+  query: Joi.object().keys({
+    token: Joi.string().required(),
+  }),
+}
+
 const authValidation = {
   login,
   logout,
   refreshTokens,
   forgotPassword,
+  resetPasswordPage,
   resetPassword,
 };
 

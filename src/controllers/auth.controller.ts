@@ -1,5 +1,6 @@
 import httpStatus from "http-status";
 import { catchAsync } from "../utils/catchAsync";
+import path from 'path';
 import { authService, tokenService, emailService } from "../services";
 import sanitizeUser from "../utils/sanitizeUser";
 
@@ -32,10 +33,16 @@ const resetPassword = catchAsync(async (req, res) => {
 });
 
 
+const resetPasswordPage = catchAsync(async (req, res) => {
+  res.sendFile(path.join(__dirname+'/../views/reset-password.html'));
+});
+
+
 export default {
   login,
   logout,
   refreshTokens,
   forgotPassword,
   resetPassword,
+  resetPasswordPage
 };

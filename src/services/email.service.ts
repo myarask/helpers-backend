@@ -1,4 +1,5 @@
 import nodemailer from "nodemailer";
+import resetEmailPasswordHTML from "../views/reset-password-email";
 import CONFIG from "../config/config";
 
 const transport = nodemailer.createTransport(CONFIG.email.smtp);
@@ -18,8 +19,8 @@ transport
  * @param {string} text
  * @returns {Promise}
  */
-const sendEmail = async (to, subject, text) => {
-  const msg = { from: CONFIG.email.from, to, subject, text };
+const sendEmail = async (to, subject, html) => {
+  const msg = { from: CONFIG.email.from, to, subject, html };
   await transport.sendMail(msg);
 };
 
@@ -32,9 +33,7 @@ const sendEmail = async (to, subject, text) => {
 const sendResetPasswordEmail = async (to, token) => {
   const subject = "Reset password";
   const resetPasswordUrl = `${CONFIG.email.resetPasswordUrl}?token=${token}`;
-  const text = `Dear user,
-To reset your password, click on this link: ${resetPasswordUrl}
-If you did not request any password resets, then ignore this email.`;
+  const text = resetEmailPasswordHTML(resetPasswordUrl);
 
 // TODO: Update text
   await sendEmail(to, subject, text);
