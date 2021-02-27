@@ -54,7 +54,7 @@ export default {
   email: {
     resetPasswordUrl: `https://${
       envVars.NODE_ENV === "development" ? "api-test" : "api"
-    }.gethelpers.ca/reset-password`,
+    }.gethelpers.ca/api/auth/reset-password`,
     smtp: {
       host: envVars.SMTP_HOST,
       port: envVars.SMTP_PORT,
