@@ -1,3 +1,10 @@
+import { TrackJS } from 'trackjs';
+import CONFIG from './config/config'
+TrackJS.install({
+  token: CONFIG.trackJSToken,
+  application: CONFIG.env === "development" ? "backend-test" : "backend"
+});
+
 import * as dotenv from "dotenv";
 import path from "path";
 dotenv.config({ path: path.resolve(__dirname, "../.env") });
@@ -17,7 +24,6 @@ import jwtStrategy from "./passport/config";
 import { errorConverter, errorHandler } from "./middlewares/error";
 import { ApiError } from "./utils/catchAsync";
 import auth from "./middlewares/auth";
-import CONFIG from './config/config'
 
 
 const server = new ApolloServer({

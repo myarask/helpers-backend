@@ -15,5 +15,22 @@ export default (router) => {
     authController.refreshTokens
   );
 
-  return router
+  router.post(
+    "/forgot-password",
+    validate(authValidation.forgotPassword),
+    authController.forgotPassword
+  );
+  router.post(
+    "/reset-password",
+    validate(authValidation.resetPassword),
+    authController.resetPassword
+  );
+
+  router.get(
+    "/reset-password",
+    validate(authValidation.resetPasswordPage),
+    authController.resetPasswordPage
+  );
+
+  return router;
 };
