@@ -132,6 +132,8 @@ const typeDefs = gql`
     visit(id: Int!): Visit
     internalUsers: [User]
     myUser: User
+    myVisit: Visit
+    myOpenVisits: [Visit]
   }
 
   type Mutation {
@@ -141,6 +143,9 @@ const typeDefs = gql`
     draftVisit(input: VisitInput): Visit
     releaseVisit(id: Int!): Visit
     saveMyCard(paymentMethodId: String!): String
+    matchVisit(id: Int!): Visit
+    startVisit(id: Int!): Visit
+    finishVisit(id: Int!): Visit
   }
 `;
 
