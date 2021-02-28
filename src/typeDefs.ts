@@ -144,6 +144,7 @@ const typeDefs = gql`
     releaseVisit(id: Int!): Visit
     saveMyCard(paymentMethodId: String!): String
     matchVisit(id: Int!): Visit
+    startVisit(id: Int!): Visit
   }
 `;
 

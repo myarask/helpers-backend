@@ -204,6 +204,8 @@ const resolvers = {
       return newCustomer.id;
     },
     matchVisit: async (_, { id }, context: Context) => {
+      // Used by a PSW to accept a visit
+
       // TODO:
       // - Ensure the right agencyId is used
       // - Check for authorized skill set
@@ -232,6 +234,37 @@ const resolvers = {
         data: {
           matchedAt: formatISO(new Date()),
           agencyUserId: agencyUser.id,
+        },
+        where: {
+          id,
+        },
+      });
+    },
+    startVisit: async (_, { id }, context: Context) => {
+      // Used by a PSW to confirm that they have arrived at the visit location
+
+      const agencyUser = await prisma.agencyUsers.findFirst({
+        where: { userId: context.myUser.id },
+      });
+
+      if (!agencyUser)
+        throw new ApolloError("An agencyUserId is required", "RESTRICTED");
+
+      const visit = await prisma.visits.findUnique({
+        where: { id },
+      });
+
+      if (!visit) throw new ApolloError("Visit cannot be found", "NO_DATA");
+      if (visit.startedAt)
+        throw new ApolloError("Visit is already started", "RESTRICTED");
+      if (visit.cancelledAt)
+        throw new ApolloError("Visit is cancelled", "RESTRICTED");
+      if (visit.agencyUserId !== agencyUser.id)
+        throw new ApolloError("Visit is taken by another PSW", "RESTRICTED");
+
+      return prisma.visits.update({
+        data: {
+          startedAt: formatISO(new Date()),
         },
         where: {
           id,
