@@ -278,15 +278,39 @@ const resolvers = {
     agencyRoles: () => prisma.roles.findMany({ where: { isAgencyRole: true } }),
     internalUsers: () => prisma.internalUsers.findMany(),
     services: () => prisma.services.findMany(),
-    visit: (_, { id }, context: Context) =>
-      prisma.visits.findFirst({
+    visit: async (_, { id }, context: Context) => {
+      const visit = await prisma.visits.findFirst({
         where: {
           id,
-          Users: {
-            id: context.myUser.id, // Only readable by visit creator
-          },
         },
-      }),
+        include: {
+          Users: true,
+          AgencyUsers: true,
+        },
+      });
+
+      if (!visit) {
+        throw new ApolloError(`Visit cannot be queried`, "NO_DATA");
+      }
+
+      // Can always be queried by the visit creator
+      if (visit.userId === context.myUser.id) {
+        return visit;
+      }
+
+      // If no match, can be queried by a PSW
+      // TODO: Restrict by qualifications
+      if (!visit.agencyUserId) {
+        return visit;
+      }
+
+      // If there is a match, can be queried by matched PSW
+      if (visit.AgencyUsers?.userId === context.myUser.id) {
+        return visit;
+      }
+
+      throw new ApolloError(`Visit cannot be queried`, "NO_DATA");
+    },
     myUser: (_, __, context: Context) =>
       prisma.users.findFirst({ where: { id: context.myUser.id } }),
   },
