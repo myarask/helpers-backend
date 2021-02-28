@@ -271,6 +271,37 @@ const resolvers = {
         },
       });
     },
+    finishVisit: async (_, { id }, context: Context) => {
+      // Used by a PSW to finish the visit.
+
+      const agencyUser = await prisma.agencyUsers.findFirst({
+        where: { userId: context.myUser.id },
+      });
+
+      if (!agencyUser)
+        throw new ApolloError("An agencyUserId is required", "RESTRICTED");
+
+      const visit = await prisma.visits.findUnique({
+        where: { id },
+      });
+
+      if (!visit) throw new ApolloError("Visit cannot be found", "NO_DATA");
+      if (visit.finishedAt)
+        throw new ApolloError("Visit is already finished", "RESTRICTED");
+      if (visit.cancelledAt)
+        throw new ApolloError("Visit is cancelled", "RESTRICTED");
+      if (visit.agencyUserId !== agencyUser.id)
+        throw new ApolloError("Visit is taken by another PSW", "RESTRICTED");
+
+      return prisma.visits.update({
+        data: {
+          finishedAt: formatISO(new Date()),
+        },
+        where: {
+          id,
+        },
+      });
+    },
   },
   Query: {
     myVisit: async (_, __, context: Context) => {
