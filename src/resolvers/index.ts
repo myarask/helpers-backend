@@ -203,6 +203,41 @@ const resolvers = {
 
       return newCustomer.id;
     },
+    matchVisit: async (_, { id }, context: Context) => {
+      // TODO:
+      // - Ensure the right agencyId is used
+      // - Check for authorized skill set
+
+      const agencyUser = await prisma.agencyUsers.findFirst({
+        where: { userId: context.myUser.id },
+      });
+
+      if (!agencyUser) {
+        throw new ApolloError("User must have an agencyUserId", "PERMISSIONS");
+      }
+
+      const visit = await prisma.visits.findUnique({
+        where: { id },
+      });
+
+      if (!visit) throw new ApolloError("Visit cannot be found", "NO_DATA");
+      if (visit.matchedAt)
+        throw new ApolloError("Visit is already matched", "RESTRICTED");
+      if (visit.cancelledAt)
+        throw new ApolloError("Visit is cancelled", "RESTRICTED");
+      if (visit.agencyUserId)
+        throw new ApolloError("Visit is already taken", "RESTRICTED");
+
+      return prisma.visits.update({
+        data: {
+          matchedAt: formatISO(new Date()),
+          agencyUserId: agencyUser.id,
+        },
+        where: {
+          id,
+        },
+      });
+    },
   },
   Query: {
     myVisit: async (_, __, context: Context) => {

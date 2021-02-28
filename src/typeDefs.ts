@@ -143,6 +143,7 @@ const typeDefs = gql`
     draftVisit(input: VisitInput): Visit
     releaseVisit(id: Int!): Visit
     saveMyCard(paymentMethodId: String!): String
+    matchVisit(id: Int!): Visit
   }
 `;
 
