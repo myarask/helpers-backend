@@ -376,7 +376,12 @@ const resolvers = {
       prisma.roles.findMany({ where: { isInternalRole: true } }),
     agencyRoles: () => prisma.roles.findMany({ where: { isAgencyRole: true } }),
     internalUsers: () => prisma.internalUsers.findMany(),
-    services: () => prisma.services.findMany(),
+    services: () =>
+      prisma.services.findMany({
+        where: {
+          deletedAt: null,
+        },
+      }),
     visit: async (_, { id }, context: Context) => {
       const visit = await prisma.visits.findFirst({
         where: {
