@@ -312,6 +312,7 @@ const resolvers = {
         where: {
           finishedAt: null,
           cancelledAt: null,
+          deletedAt: null,
           AgencyUsers: {
             userId,
           },
@@ -340,6 +341,7 @@ const resolvers = {
           releasedAt: {
             not: null,
           },
+          deletedAt: null,
         },
         include: {
           VisitServices: true,
@@ -361,6 +363,7 @@ const resolvers = {
           releasedAt: {
             not: null,
           },
+          deletedAt: null,
           Users: {
             id: context.myUser.id, // Only readable by visit creator
           },
