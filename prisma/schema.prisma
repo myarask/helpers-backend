@@ -1,5 +1,5 @@
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
   binaryTargets = ["native", "rhel-openssl-1.0.x"]
 }
 
@@ -10,10 +10,10 @@ datasource db {
 
 model Agencies {
   id          Int           @id @default(autoincrement())
-  name        String?
-  createdAt   DateTime
-  updatedAt   DateTime
-  deletedAt   DateTime?
+  name        String?       @db.VarChar(255)
+  createdAt   DateTime      @db.Timestamptz(6)
+  updatedAt   DateTime      @db.Timestamptz(6)
+  deletedAt   DateTime?     @db.Timestamptz(6)
   AgencyUsers AgencyUsers[]
 }
 
@@ -21,18 +21,18 @@ model AgencyUserRoles {
   id           Int          @id @default(autoincrement())
   agencyUserId Int?
   roleId       Int?
-  createdAt    DateTime
-  updatedAt    DateTime
-  deletedAt    DateTime?
+  createdAt    DateTime     @db.Timestamptz(6)
+  updatedAt    DateTime     @db.Timestamptz(6)
+  deletedAt    DateTime?    @db.Timestamptz(6)
   AgencyUsers  AgencyUsers? @relation(fields: [agencyUserId], references: [id])
   Roles        Roles?       @relation(fields: [roleId], references: [id])
 }
 
 model AgencyUserServices {
   id           Int         @id @default(autoincrement())
-  createdAt    DateTime
-  updatedAt    DateTime
-  deletedAt    DateTime?
+  createdAt    DateTime    @db.Timestamptz(6)
+  updatedAt    DateTime    @db.Timestamptz(6)
+  deletedAt    DateTime?   @db.Timestamptz(6)
   serviceId    Int
   agencyUserId Int
   AgencyUsers  AgencyUsers @relation(fields: [agencyUserId], references: [id])
@@ -43,9 +43,9 @@ model AgencyUsers {
   id                 Int                  @id @default(autoincrement())
   userId             Int
   agencyId           Int
-  createdAt          DateTime
-  updatedAt          DateTime
-  deletedAt          DateTime?
+  createdAt          DateTime             @db.Timestamptz(6)
+  updatedAt          DateTime             @db.Timestamptz(6)
+  deletedAt          DateTime?            @db.Timestamptz(6)
   Agencies           Agencies             @relation(fields: [agencyId], references: [id])
   Users              Users                @relation(fields: [userId], references: [id])
   AgencyUserRoles    AgencyUserRoles[]
@@ -58,18 +58,18 @@ model AgencyUsers {
 model Clients {
   id          Int       @id @default(autoincrement())
   userId      Int?
-  createdAt   DateTime
-  updatedAt   DateTime
-  deletedAt   DateTime?
-  approvedAt  DateTime?
-  city        String
-  country     String
-  line1       String
-  line2       String?
-  postalCode  String
-  state       String
-  fullName    String
-  phoneNumber String?
+  createdAt   DateTime  @db.Timestamptz(6)
+  updatedAt   DateTime  @db.Timestamptz(6)
+  deletedAt   DateTime? @db.Timestamptz(6)
+  approvedAt  DateTime? @db.Timestamptz(6)
+  city        String    @db.VarChar(255)
+  country     String    @db.VarChar(255)
+  line1       String    @db.VarChar(255)
+  line2       String?   @db.VarChar(255)
+  postalCode  String    @db.VarChar(255)
+  state       String    @db.VarChar(255)
+  fullName    String    @db.VarChar(255)
+  phoneNumber String?   @db.VarChar(255)
   Users       Users?    @relation(fields: [userId], references: [id])
   Visits      Visits[]
 }
@@ -78,9 +78,9 @@ model InternalUserRoles {
   id             Int            @id @default(autoincrement())
   internalUserId Int?
   roleId         Int?
-  createdAt      DateTime
-  updatedAt      DateTime
-  deletedAt      DateTime?
+  createdAt      DateTime       @db.Timestamptz(6)
+  updatedAt      DateTime       @db.Timestamptz(6)
+  deletedAt      DateTime?      @db.Timestamptz(6)
   InternalUsers  InternalUsers? @relation(fields: [internalUserId], references: [id])
   Roles          Roles?         @relation(fields: [roleId], references: [id])
 }
@@ -88,63 +88,64 @@ model InternalUserRoles {
 model InternalUsers {
   id                Int                 @id @default(autoincrement())
   userId            Int?
-  createdAt         DateTime
-  updatedAt         DateTime
-  deletedAt         DateTime?
+  createdAt         DateTime            @db.Timestamptz(6)
+  updatedAt         DateTime            @db.Timestamptz(6)
+  deletedAt         DateTime?           @db.Timestamptz(6)
   Users             Users?              @relation(fields: [userId], references: [id])
   InternalUserRoles InternalUserRoles[]
 }
 
 model Roles {
   id                Int                 @id @default(autoincrement())
-  name              String?
-  createdAt         DateTime
-  updatedAt         DateTime
+  name              String?             @db.VarChar(255)
+  createdAt         DateTime            @db.Timestamptz(6)
+  updatedAt         DateTime            @db.Timestamptz(6)
   isInternalRole    Boolean?
   isAgencyRole      Boolean?
-  deletedAt         DateTime?
+  deletedAt         DateTime?           @db.Timestamptz(6)
   AgencyUserRoles   AgencyUserRoles[]
   InternalUserRoles InternalUserRoles[]
 }
 
 model SequelizeMeta {
-  name String @id
+  name String @id @db.VarChar(255)
 }
 
 model Services {
   id                 Int                  @id @default(autoincrement())
-  createdAt          DateTime
-  updatedAt          DateTime
-  deletedAt          DateTime?
-  name               String
+  createdAt          DateTime             @db.Timestamptz(6)
+  updatedAt          DateTime             @db.Timestamptz(6)
+  deletedAt          DateTime?            @db.Timestamptz(6)
+  name               String               @db.VarChar(255)
   fee                Int
+  description        String?              @db.VarChar(255)
   AgencyUserServices AgencyUserServices[]
   VisitServices      VisitServices[]
 }
 
 model Tokens {
   id          Int      @id @default(autoincrement())
-  createdAt   DateTime
-  updatedAt   DateTime
-  expiresAt   DateTime
+  createdAt   DateTime @db.Timestamptz(6)
+  updatedAt   DateTime @db.Timestamptz(6)
+  expiresAt   DateTime @db.Timestamptz(6)
   userId      Int
-  token       String
-  type        String
+  token       String   @db.VarChar(255)
+  type        String   @db.VarChar(255)
   blacklisted Boolean
   Users       Users    @relation(fields: [userId], references: [id])
 }
 
 model Users {
   id            Int             @id @default(autoincrement())
-  createdAt     DateTime
-  updatedAt     DateTime
-  email         String          @unique
-  fullName      String?
-  auth0Id       String?         @unique
-  deletedAt     DateTime?
-  customerId    String?
-  phoneNumber   String?
-  password      String?
+  createdAt     DateTime        @db.Timestamptz(6)
+  updatedAt     DateTime        @db.Timestamptz(6)
+  email         String          @unique @db.VarChar(255)
+  fullName      String?         @db.VarChar(255)
+  auth0Id       String?         @unique @db.VarChar(255)
+  deletedAt     DateTime?       @db.Timestamptz(6)
+  customerId    String?         @db.VarChar(255)
+  phoneNumber   String?         @db.VarChar(255)
+  password      String?         @db.VarChar(255)
   AgencyUsers   AgencyUsers[]
   Clients       Clients[]
   InternalUsers InternalUsers[]
@@ -156,11 +157,11 @@ model VisitServices {
   id        Int       @id @default(autoincrement())
   visitId   Int
   serviceId Int
-  name      String?
+  name      String?   @db.VarChar(256)
   fee       Int?
-  createdAt DateTime?
-  updatedAt DateTime?
-  deletedAt DateTime?
+  createdAt DateTime? @db.Timestamptz(6)
+  updatedAt DateTime? @db.Timestamptz(6)
+  deletedAt DateTime? @db.Timestamptz(6)
   Services  Services  @relation(fields: [serviceId], references: [id])
   Visits    Visits    @relation(fields: [visitId], references: [id])
 }
@@ -170,23 +171,23 @@ model Visits {
   clientId        Int?
   userId          Int?
   agencyUserId    Int?
-  notes           String?
-  city            String
-  country         String
-  state           String
-  line1           String
-  line2           String?
-  postalCode      String
-  releasedAt      DateTime?
-  matchedAt       DateTime?
-  startedAt       DateTime?
-  finishedAt      DateTime?
-  cancelledAt     DateTime?
-  createdAt       DateTime?
-  updatedAt       DateTime?
-  deletedAt       DateTime?
+  notes           String?         @db.VarChar(255)
+  city            String          @db.VarChar(255)
+  country         String          @db.VarChar(255)
+  state           String          @db.VarChar(256)
+  line1           String          @db.VarChar(256)
+  line2           String?         @db.VarChar(256)
+  postalCode      String          @db.VarChar(256)
+  releasedAt      DateTime?       @db.Timestamptz(6)
+  matchedAt       DateTime?       @db.Timestamptz(6)
+  startedAt       DateTime?       @db.Timestamptz(6)
+  finishedAt      DateTime?       @db.Timestamptz(6)
+  cancelledAt     DateTime?       @db.Timestamptz(6)
+  createdAt       DateTime?       @db.Timestamptz(6)
+  updatedAt       DateTime?       @db.Timestamptz(6)
+  deletedAt       DateTime?       @db.Timestamptz(6)
   baseFee         Int?
-  paymentIntentId String?
+  paymentIntentId String?         @db.VarChar(255)
   AgencyUsers     AgencyUsers?    @relation(fields: [agencyUserId], references: [id])
   Clients         Clients?        @relation(fields: [clientId], references: [id])
   Users           Users?          @relation(fields: [userId], references: [id])
