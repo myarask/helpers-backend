@@ -70,6 +70,7 @@ const typeDefs = gql`
   type Service {
     id: Int!
     name: String
+    description: String
     fee: Int
   }
 
